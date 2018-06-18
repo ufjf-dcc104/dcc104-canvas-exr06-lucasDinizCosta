@@ -20,10 +20,9 @@ Map.prototype.desenhar = function (ctx) {
         ctx.fillRect(c*this.s, l*this.s, this.s, this.s);
         //ctx.strokeRect(c*this.s, l*this.s, this.s, this.s);
       } else if(this.cell[l][c] === 1){          //Bloqueado
-        ctx.fillStyle = "green";
-        ctx.strokeStyle = "grey";
-        ctx.fillRect(c*this.s, l*this.s, this.s, this.s);
-        ctx.strokeRect(c*this.s, l*this.s, this.s, this.s);
+        //ctx.strokeStyle = "grey";
+        imageLibrary.drawSize(ctx, "brickRed", c*this.s, l*this.s, this.s, this.s);
+        //ctx.strokeRect(c*this.s, l*this.s, this.s, this.s);
       } else if(this.cell[l][c] === 2){           //Terreno a desbravar
         ctx.fillStyle = "lightBlue";
         ctx.strokeStyle = "grey";

@@ -4,23 +4,38 @@ function Sprite() {
   this.vx = 0;
   this.y = 0;
   this.vy = 0;
-  
+  this.w = 0;
+  this.h = 0;
+
   //Atributos de grade
   this.gx = 0;
   this.gy = 0;
   this.s = 16;
   this.map;
-  
+
   //Atributos da imagem
   this.wImagem = 0;
   this.hImagem = 0;
   this.sx = 0;
   this.sy = 0;
+
+  this.colorBG;
+  this.colorBorder;
+  this.borderSize = 1;
 };
 
 Sprite.prototype.mover = function (dt) {
   this.gx = Math.floor(this.x/this.map.s);
   this.gy = Math.floor(this.y/this.map.s);
+
+  /****************************************************************
+  * Outro meio de andar nesse caso é utilizando a propria grade***
+  *****************************************************************/
+
+  /*
+    this.x = this.gx*this.map.s + this.s;       //Andando por grade
+    this.y = this.gy*this.map.s + this.s;
+  */
 
   if(this.vx < 0 && this.map.cell[this.gy][this.gx-1]===1){
     var limite = (this.gx)*this.map.s;
@@ -43,7 +58,7 @@ Sprite.prototype.mover = function (dt) {
     var Dx = this.vx*dt;
     this.x += Math.min(Dx, maxDx);
   }*/
-  
+
   //Ponto central do sprite é o meio, logo compara com metade somente
   //Tem alguns bugs em entrar parte nos blocos não permitidos
 
@@ -91,6 +106,14 @@ Sprite.prototype.desenhar = function (ctx) {
 Sprite.prototype.desenharCell = function(ctx){
   ctx.strokeStyle = "white";
   ctx.strokeRect(this.gx*this.map.s, this.gy*this.map.s, this.map.s, this.map.s)
+};
+
+Sprite.prototype.desenharTempo = function (ctx) {
+  ctx.fillStyle = this.colorBG;
+  ctx.strokeStyle = this.colorBorder;
+  ctx.lineWidth = this.borderSize;
+  ctx.fillRect(this.x, this.y, this.w, this.h);
+  ctx.strokeRect(this.x, this.y, this.w, this.h);
 };
 
 Sprite.prototype.impoeLimites = function(x, y, w, h){

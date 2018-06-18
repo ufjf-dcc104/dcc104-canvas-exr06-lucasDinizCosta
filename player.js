@@ -1,5 +1,5 @@
 function Player() {
-  this.sprite = new Sprite();
+  this.sprite = new Sprite();  
 
   //Mapa das teclas pressionadas
   this.up = false;
