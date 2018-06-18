@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Jogo 06 - Indiana Jones</title>
+    <script src="Map.js"></script>
+    <script src="player.js"></script>
+    <script src="Sprite.js"></script>
+	<script src="ImageLibrary.js" charset="utf-8"></script>
+    <script src="AudioLibrary.js" charset="utf-8"></script>
+  </head>
+  <body>
+	<h1>Jogo 06 - Indiana Jones</h1>
+    <canvas id="canvas" width="500" height="300">
+		Seu browser não suporta canvas!
+	</canvas>
+    <script>
+    var tela = document.getElementById("canvas");
+	tela.style.border = '2px solid #000';                       //Colocando borda no canvas
+	
+    var ctx = tela.getContext("2d");
+    var mapa = new Map(20, 10, 32);
+    mapa.cell = MAPA1;
+    var anterior = dt = 0;
+	var tempoGameOver = 2;
+    var estado = 0;
+    var player = new Player();
+    var playerVel = 100;
+    player.sprite.map = mapa;
+    player.sprite.x = 53;
+    player.sprite.y = 140;
+	
+	var imageLibrary = new ImageLibrary();
+    imageLibrary.load("platformer_tiles", "Imagens/platformertiles.png");
+    imageLibrary.load("dark_background", "Imagens/dark_background.png");
+    imageLibrary.load("trees_background", "Imagens/trees.png");
+    imageLibrary.load("house01", "Imagens/House01.png");
+    imageLibrary.load("house02", "Imagens/House02.png");
+    imageLibrary.load("house01Destroyed", "Imagens/House01_Destroyed.png");
+    imageLibrary.load("house02Destroyed", "Imagens/House02_Destroyed.png");
+    imageLibrary.load("bullet", "Imagens/bullet.png");
+    imageLibrary.load("gunTurret", "Imagens/GunTurret.png");
+    imageLibrary.load("ground_1", "Imagens/tile1.png");
+    imageLibrary.load("asteroide", "Imagens/Asteroides.png");
+
+    var audioLibrary = new AudioLibrary();
+	
+	//Main Menu campos
+    var fontMainMenu = "30px Arial Black";
+    var wordsColor = "white";
+    var alignMainMenu = "center";
+    var stateMainMenu = 0;
+
+    requestAnimationFrame(passo)
+    function passo(t){
+      dt = (t - anterior)/1000;
+	  if(imageLibrary.loaded+audioLibrary.loaded<imageLibrary.size+audioLibrary.size) {//if(il.loaded+al.loaded<il.size+al.size) {
+        //ctx.fillStyle = "white";
+        //ctx.fillText("Carregando imagens e audio... "+(100*(il.loaded+al.loaded)/(il.size+al.loaded)).toFixed(2)+"%", 20, 100);
+        console.log("Carregando imagens e audio... "+(100*(imageLibrary.loaded+audioLibrary.loaded)/(imageLibrary.size+audioLibrary.size)).toFixed(2)+"%", 20, 100);
+        console.log("Não terminou de carregar...");
+        //return;
+      }
+	  else{
+	  switch (estado) {
+          case 0:
+            limparTela();
+            ctx.font = "20px Arial Black";
+            ctx.fillStyle = "white";
+            ctx.textAlign = alignMainMenu;
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "black";
+            imageLibrary.drawClipSize(ctx, "platformer_tiles", 97, 33, 30, 32, 0, 0, tela.width, tela.height);    //Fundo Azul
+            /*if(player.vidas <= 0){
+              estado = 2;
+            }*/
+			limparTela();
+			player.mover(dt);
+			mapa.desenhar(ctx);
+			player.desenhar(ctx);
+            //imageLibrary.drawClipSize(ctx, "spriteSheet", 0, 0, 144, 223, 0, 0, tela.width, tela.height-56);      //Background
+            ctx.strokeText("Pontos: ", tela.width - 120,20);
+            ctx.fillText("Pontos: ", tela.width - 120,20);
+            ctx.strokeText(player.pontos, tela.width - 50, 20);
+            ctx.fillText(player.pontos, tela.width - 50, 20);
+            break;
+          case 1:         //Main menu
+            limparTela();
+            imageLibrary.drawSize(ctx, "dark_background", 0, 0, tela.width, tela.height); // Imagem do fundo
+            ctx.fillStyle = wordsColor;
+            ctx.textAlign = alignMainMenu;
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "black";
+            ctx.font = "40px Arial Black";
+            ctx.strokeText("Indiana Jones", tela.width/2, tela.height/3);
+            ctx.fillText("Indiana Jones", tela.width/2, tela.height/3);
+            ctx.font = "15px Arial Black";
+            ctx.font = fontMainMenu;
+            if(stateMainMenu == 0){
+              ctx.fillStyle = "blue";
+              ctx.strokeText("New Game", tela.width/2, tela.height/2 + tela.height/4-15);
+              ctx.fillText("New Game", tela.width/2, tela.height/2 + tela.height/4-15);
+              ctx.fillStyle = wordsColor;
+              ctx.strokeText("Quit", tela.width/2, tela.height/2 + tela.height/3);
+              ctx.fillText("Quit", tela.width/2, tela.height/2 + tela.height/3);
+            }
+            else{
+              ctx.fillStyle = wordsColor;
+              ctx.strokeText("New Game", tela.width/2, tela.height/2 + tela.height/4-15);
+              ctx.fillText("New Game", tela.width/2, tela.height/2 + tela.height/4-15);
+              ctx.fillStyle = "blue";
+              ctx.strokeText("Quit", tela.width/2, tela.height/2 + tela.height/3);
+              ctx.fillText("Quit", tela.width/2, tela.height/2 + tela.height/3);
+            }
+
+            break;
+          case 2:
+            limparTela();
+            ctx.fillStyle = "white";
+            ctx.textAlign = alignMainMenu;
+            ctx.font = "40px Arial Black";
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "black";
+            ctx.strokeText("GAME OVER", tela.width/2, tela.height/2);
+            ctx.fillText("GAME OVER", tela.width/2, tela.height/2);
+            if(tempoGameOver >= 0){
+                tempoGameOver = tempoGameOver - 0.7*dt;
+            }
+            else{
+                limparDados();
+                estado = 1;
+            }
+
+            break;
+          case 3:
+            limparTela();
+            break;
+          default:
+
+        }
+      }
+      anterior = t;
+	  requestAnimationFrame(passo);
+    }
+	
+	function limparDados(){
+      player.teasures = 0;   //Limpa o objeto
+      player = null;
+      tempoGameOver = 2;
+      stateMainMenu = 0;
+    }
+
+    function limparTela() {
+      ctx.fillStyle = "black";
+      ctx.fillRect(0,0, tela.width, tela.height);
+      //ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+	
+	function getRandomArbitrary(min, max){
+      return Math.floor(Math.random()*(max - min)) + min;                     //Seleciona um valor entre o min e o max
+    }
+
+    addEventListener("keydown", function(e){
+      console.log(e.keyCode);
+      if (estado == 0) {
+        switch (e.keyCode) {
+          case 37:
+            if(player.up === false && player.down === false && player.right === false){
+              player.sprite.vx = -playerVel;
+              player.left = true;
+            }
+            break;
+          case 39:
+            if(player.up === false && player.down === false && player.left === false){
+              player.sprite.vx = +playerVel;
+              player.right = true;
+            }
+
+            break;
+          case 32:  //Espaco
+            break;
+          case 38:
+            if(player.left === false && player.down === false && player.right === false){
+              player.sprite.vy = -playerVel;
+              player.up = true;
+            }
+            break;
+          case 40:
+            if(player.left === false && player.up === false && player.right === false){
+              player.sprite.vy = +playerVel;
+              player.down = true;
+            }
+            break;
+          case 27:      //Pressionar o Esq
+            //stateMainMenu = 0;
+            estado = 3;
+            break;
+          default:
+        }
+      }
+      else{
+        if(estado == 2){
+          switch (e.keyCode) {
+            case 13:    //Enter
+              limparDados();
+              estado = 1;
+              break;
+            default:
+          }
+        }
+        else{
+          switch (e.keyCode) {
+            case 13:    //Enter
+              if(estado != 2){
+                if(stateMainMenu == 0){
+                  player = new Player();
+                  estado = 0;
+                }
+                else{
+                  estado = 3;
+                }
+              }
+              break;
+            case 32:         //Space bar
+              if(estado != 2){
+                if(stateMainMenu == 0){
+                  player = new Player();
+                  estado = 0;
+                }
+                else{
+                  estado = 3;
+                }
+              }
+              break;
+            case 38:
+              if(stateMainMenu == 1){
+                stateMainMenu = 0;
+              }
+              break;
+            case 40:
+              if(stateMainMenu == 0){
+                stateMainMenu = 1;
+              }
+              break;
+            case 27:      //Pressionar o Esq
+              stateMainMenu = 0;
+              limparDados();
+              estado = 1;
+              break;
+            default:
+          }
+        }
+      }
+
+    });
+
+    addEventListener("keyup", function(e){
+      switch (e.keyCode) {
+        case 37:
+          player.sprite.vx = 0;
+          player.left = false;
+          break;
+        case 39:
+          player.sprite.vx = 0;
+          player.right = false;
+          break;
+        case 38:
+          player.sprite.vy = 0;
+          player.up = false;
+          break;
+        case 40:
+          player.sprite.vy = 0;
+          player.down = false;
+          break;
+        default:
+      }
+    });
+    </script>
+  </body>
+</html>
