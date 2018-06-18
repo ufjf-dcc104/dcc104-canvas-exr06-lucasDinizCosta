@@ -29,6 +29,10 @@ Map.prototype.desenhar = function (ctx) {
         ctx.fillRect(c*this.s, l*this.s, this.s, this.s);
         ctx.strokeRect(c*this.s, l*this.s, this.s, this.s);
       } else if(this.cell[l][c] === 3){           //Terreno a desbravar com mina embaixo
+        ctx.fillStyle = "darkgrey";
+        ctx.strokeStyle = "grey";
+        ctx.fillRect(c*this.s + this.s/3, l*this.s + this.s/3, this.s/3, this.s/3);
+        ctx.strokeRect(c*this.s + this.s/3, l*this.s + this.s/3, this.s/3, this.s/3);
         ctx.fillStyle = "lightBlue";
         ctx.strokeStyle = "grey";
         ctx.fillRect(c*this.s, l*this.s, this.s, this.s);
@@ -38,6 +42,16 @@ Map.prototype.desenhar = function (ctx) {
         ctx.strokeStyle = "grey";
         ctx.fillRect(c*this.s, l*this.s, this.s, this.s);
         ctx.strokeRect(c*this.s, l*this.s, this.s, this.s);
+      } else if(this.cell[l][c] === 5){             //Mina
+        ctx.fillStyle = "darkgrey";
+        ctx.strokeStyle = "grey";
+        ctx.fillRect(c*this.s + this.s/3, l*this.s + this.s/3, this.s/3, this.s/3);
+        ctx.strokeRect(c*this.s + this.s/3, l*this.s + this.s/3, this.s/3, this.s/3);
+      } else if(this.cell[l][c] === 6){             //Tesouro
+        ctx.fillStyle = "yellow";
+        ctx.strokeStyle = "grey";
+        ctx.fillRect(c*this.s + this.s/3, l*this.s + this.s/3, this.s/3, this.s/3);
+        ctx.strokeRect(c*this.s + this.s/3, l*this.s + this.s/3, this.s/3, this.s/3);
       }
     }
   }
@@ -45,7 +59,7 @@ Map.prototype.desenhar = function (ctx) {
 
 /*var MAPA1 = [
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
   [1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1],
   [1,1,1,1,1,1,1,1,0,1,0,0,0,1,0,0,0,0,1],
   [1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,1],
@@ -57,14 +71,14 @@ Map.prototype.desenhar = function (ctx) {
 ];*/
 
 var MAPA1 = [
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1],
-  [1,1,1,1,1,1,1,1,0,1,0,0,0,1,0,0,0,0,1],
-  [1,0,2,2,2,0,0,0,0,0,0,0,0,1,1,1,1,0,1],
-  [1,0,2,2,2,0,0,0,0,0,0,0,0,1,0,0,0,0,1],
-  [1,0,1,1,1,0,0,0,0,1,0,0,0,1,0,0,0,1,1],
-  [1,0,0,0,0,0,0,0,1,1,1,0,0,1,1,1,0,1,1],
-  [1,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,1,1,1,1,1,1,1,0,0,0,0,5,0,0,1],
+  [1,0,2,2,2,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,2,2,2,0,0,0,0,0,0,0,0,3,0,1],
+  [1,0,1,1,1,0,0,0,0,1,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,1,1,1,0,0,0,0,1],
+  [1,0,0,6,0,0,0,1,1,1,1,1,0,0,0,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 ];
