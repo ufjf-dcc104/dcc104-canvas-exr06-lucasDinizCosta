@@ -1,6 +1,8 @@
 function Player() {
   this.sprite = new Sprite();
   this.timeWalkSound = 0.5;
+  this.levelNumber = 1;
+
   //Mapa das teclas pressionadas
   this.up = false;
   this.down = false;
