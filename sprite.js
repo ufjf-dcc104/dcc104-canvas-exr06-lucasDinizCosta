@@ -100,7 +100,7 @@ Sprite.prototype.desenhar = function (ctx) {
   ctx.fillRect(-this.s/2, -this.s/2, this.s, this.s);
   ctx.strokeRect(-this.s/2, -this.s/2, this.s, this.s);
   ctx.restore();
-  this.desenharCell(ctx);
+  //this.desenharCell(ctx);         //Debug mode Grid
 };
 
 Sprite.prototype.desenharCell = function(ctx){

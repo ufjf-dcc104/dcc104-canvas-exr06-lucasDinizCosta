@@ -2,7 +2,7 @@
 <html lang="pt" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>Jogo 06 - Indiana Jones</title>
+    <title>Jogo 06 - Treasure explorer</title>
     <script src="Map.js"></script>
     <script src="Level.js"></script>
     <script src="player.js"></script>
@@ -11,7 +11,7 @@
     <script src="AudioLibrary.js" charset="utf-8"></script>
   </head>
   <body>
-	<h1>Jogo 06 - Indiana Jones</h1>
+	<h1>Jogo 06 - Treasure explorer</h1>
     <canvas id="canvas" width="600" height="350">
 		Seu browser não suporta canvas!
 	</canvas>
@@ -59,8 +59,12 @@
     imageLibrary.load("brickRed", "Imagens/brickred.png");
     imageLibrary.load("sandGround", "Imagens/SandGround.png");
     imageLibrary.load("sandBlock", "Imagens/Minecraft/Sand.png");
-
     var audioLibrary = new AudioLibrary();
+    audioLibrary.load("hurt", "Audios/classic_hurt.ogg");
+    audioLibrary.load("explode", "Audios/explode1.ogg");
+    audioLibrary.load("sandWalk", "Audios/sand1.ogg");
+    audioLibrary.load("treasureCollect", "Audios/treasureCollect.ogg");
+    audioLibrary.load("BGM", "Audios/Minecraft_-Wet_Hands(piano).mp3");
 
     //Tempo
     var tempoRectExt = new Sprite();
@@ -98,13 +102,9 @@
     	  switch (estado) {
             case 0:
               limparTela();
-
-              //imageLibrary.drawClipSize(ctx, "platformer_tiles", 97, 33, 30, 32, 0, 0, tela.width, tela.height);    //Fundo Azul
-              /*if(player.vidas <= 0){
-                estado = 2;
-              }*/
-              //Checking treasures/mines arround
-              //mapa.cell[player.sprite.gx][player.sprite.gy] //grid of player
+              if(audioLibrary.isPlaying("BGM")==false){
+                audioLibrary.play("BGM");
+              }
               player.mover(dt);
               for (var i = player.sprite.gy-1; i <= player.sprite.gy+1; i++) {
                 for (var j = player.sprite.gx-1; j <= player.sprite.gx+1; j++) {
@@ -117,15 +117,10 @@
                   }
                 }
               }
-
-
         			mapa.desenhar(ctx);
         			player.desenhar(ctx);
-              //ctx.fillStyle = "white";
               tempoRectExt.desenharTempo(ctx);
               tempoRectInt.desenharTempo(ctx);
-
-              //imageLibrary.drawClipSize(ctx, "spriteSheet", 0, 0, 144, 223, 0, 0, tela.width, tela.height-56);      //Background
               ctx.font = "15px Arial Black";
               ctx.fillStyle = "white";
               ctx.textAlign = alignMainMenu;
@@ -156,11 +151,20 @@
               minesCount = 0;
               if(mapa.cell[player.sprite.gy][player.sprite.gx]===4){
                 teasuresCollected++;
+                audioLibrary.play("treasureCollect");
                 mapa.cell[player.sprite.gy][player.sprite.gx]=0;
               }
               if(tempoRectInt.w===0||mapa.cell[player.sprite.gy][player.sprite.gx]===3){
+                if(audioLibrary.isPlaying("BGM")){
+                  audioLibrary.stop("BGM");
+                }
+                if(mapa.cell[player.sprite.gy][player.sprite.gx]===3){
+                  audioLibrary.play("hurt");
+                  audioLibrary.play("explode");
+                }
                 estado = 2;
               }
+
               //console.log(tempoTransicaoFase);
               //ctx.strokeText(player.pontos, tela.width - 50, 20);
               //ctx.fillText(player.pontos, tela.width - 50, 20);
@@ -168,13 +172,16 @@
             case 1:         //Main menu
               limparTela();
               //imageLibrary.drawSize(ctx, "dark_background", 0, 0, tela.width, tela.height); // Imagem do fundo
+              if(audioLibrary.isPlaying("BGM")==false){
+                audioLibrary.play("BGM");
+              }
               ctx.fillStyle = wordsColor;
               ctx.textAlign = alignMainMenu;
               ctx.lineWidth = 2;
               ctx.strokeStyle = "black";
               ctx.font = "40px Arial Black";
-              ctx.strokeText("Indiana Jones", tela.width/2, tela.height/3);
-              ctx.fillText("Indiana Jones", tela.width/2, tela.height/3);
+              ctx.strokeText("Treasure explorer", tela.width/2, tela.height/3);
+              ctx.fillText("Treasure explorer", tela.width/2, tela.height/3);
               ctx.font = "15px Arial Black";
               ctx.font = fontMainMenu;
               if(stateMainMenu == 0){
