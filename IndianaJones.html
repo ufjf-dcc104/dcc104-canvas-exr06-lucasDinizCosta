@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>Jogo 06 - Indiana Jones</title>
     <script src="Map.js"></script>
+    <script src="Level.js"></script>
     <script src="player.js"></script>
     <script src="Sprite.js"></script>
   	<script src="ImageLibrary.js" charset="utf-8"></script>
@@ -11,7 +12,7 @@
   </head>
   <body>
 	<h1>Jogo 06 - Indiana Jones</h1>
-    <canvas id="canvas" width="500" height="300">
+    <canvas id="canvas" width="600" height="350">
 		Seu browser não suporta canvas!
 	</canvas>
     <script>
@@ -19,8 +20,24 @@
 	  tela.style.border = '2px solid #000';                       //Colocando borda no canvas
 
     var ctx = tela.getContext("2d");
-    var mapa = new Map(16, 10, 32);
-    mapa.cell = MAPA1;
+    //var fase = new Level();
+    var level_01 = new Level();
+    level_01.mapLevel = [
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,0,0,0,0,5,0,0,0,0,0,1],
+      [1,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,2,2,2,0,0,0,0,0,0,0,0,3,0,0,0,0,1],
+      [1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,3,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
+      [1,0,0,4,4,0,0,0,1,1,1,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,6,1,1,1,1,1,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    ];
+    var mapa = new Map(19, 11, 32);
+    ajustarMapaLevel(level_01);
+
     var anterior = dt = 0;
 	  var tempoGameOver = 2;
     var tempoTransicaoFase = 1;     //Tempo que decai um pouco da barra
@@ -32,12 +49,17 @@
     player.sprite.map = mapa;
     player.sprite.x = 53;
     player.sprite.y = 140;
-    var posicaoAntigaGrade = 0;
+
     var treasuresCount = 0;           //Counting treasures arround of player
     var minesCount = 0;               //Counting mines arround of player
+    var teasuresNumber = 5;           //Number corresponding to treasures on level
+    var teasuresCollected = 0;
 
 	  var imageLibrary = new ImageLibrary();
     imageLibrary.load("brickRed", "Imagens/brickred.png");
+    imageLibrary.load("sandGround", "Imagens/SandGround.png");
+    imageLibrary.load("sandBlock", "Imagens/Minecraft/Sand.png");
+
     var audioLibrary = new AudioLibrary();
 
     //Tempo
@@ -111,10 +133,15 @@
               ctx.strokeStyle = "black";
               ctx.strokeText("Tempo: ", 55, 20);
               ctx.fillText("Tempo: ", 55, 20);
-              ctx.strokeText("Minas: "+minesCount, 285, 20);
-              ctx.fillText("Minas: "+minesCount, 285, 20);
-              ctx.strokeText("Tesouros: "+treasuresCount, tela.width - 70, 20);
-              ctx.fillText("Tesouros: "+treasuresCount, tela.width - 70, 20);
+              ctx.strokeText("Minas prox: "+minesCount, 370, 20);
+              ctx.fillText("Minas prox: "+minesCount, 370, 20);
+              ctx.strokeText("Tesouros prox: "+treasuresCount, tela.width - 90, 20);
+              ctx.fillText("Tesouros prox: "+treasuresCount, tela.width - 90, 20);
+              ctx.strokeText("Encontre "+teasuresNumber+" tesouros", 170, tela.height-10);
+              ctx.fillText("Encontre "+teasuresNumber+" tesouros", 170, tela.height-10);
+              ctx.strokeText("Tesouros encontrados: "+ teasuresCollected, 470, tela.height-10);
+              ctx.fillText("Tesouros encontrados: "+ teasuresCollected, 470, tela.height-10);
+
               if(tempoTransicaoFase <= 0){
                 tempoTransicaoFase = 1;
                 tempoRectInt.w = tempoRectInt.w - taxaDiminuicaoTempo;
@@ -127,14 +154,20 @@
               }
               treasuresCount = 0;
               minesCount = 0;
-
+              if(mapa.cell[player.sprite.gy][player.sprite.gx]===4){
+                teasuresCollected++;
+                mapa.cell[player.sprite.gy][player.sprite.gx]=0;
+              }
+              if(tempoRectInt.w===0||mapa.cell[player.sprite.gy][player.sprite.gx]===3){
+                estado = 2;
+              }
               //console.log(tempoTransicaoFase);
               //ctx.strokeText(player.pontos, tela.width - 50, 20);
               //ctx.fillText(player.pontos, tela.width - 50, 20);
               break;
             case 1:         //Main menu
               limparTela();
-              imageLibrary.drawSize(ctx, "dark_background", 0, 0, tela.width, tela.height); // Imagem do fundo
+              //imageLibrary.drawSize(ctx, "dark_background", 0, 0, tela.width, tela.height); // Imagem do fundo
               ctx.fillStyle = wordsColor;
               ctx.textAlign = alignMainMenu;
               ctx.lineWidth = 2;
@@ -196,6 +229,10 @@
       player = null;
       tempoGameOver = 2;
       stateMainMenu = 0;
+      tempoRectInt.w = 125;
+      treasuresCount = 0;
+      minesCount = 0;
+      tempoTransicaoFase = 1;
     }
 
     function limparTela() {
@@ -206,6 +243,15 @@
 
 	 function getRandomArbitrary(min, max){
       return Math.floor(Math.random()*(max - min)) + min;                     //Seleciona um valor entre o min e o max
+   }
+
+   function ajustarMapaLevel(level){
+     for (var l = 0; l < mapa.h; l++) {
+       mapa.cell[l] = [];
+       for (var c = 0; c < mapa.w; c++) {
+         mapa.cell[l][c] = level.mapLevel[l][c];
+       }
+     }
    }
 
     addEventListener("keydown", function(e){
@@ -245,7 +291,7 @@
             break;
           case 27:      //Pressionar o Esq
             stateMainMenu = 0;
-            estado = 3;
+            estado = 1;
             break;
           default:
         }
@@ -265,7 +311,11 @@
             case 13:    //Enter
               if(estado != 2){
                 if(stateMainMenu == 0){
+                  mapa.cell = level_01.mapLevel;
                   player = new Player();
+                  player.sprite.map = mapa;
+                  player.sprite.x = 53;
+                  player.sprite.y = 140;
                   estado = 0;
                 }
                 else{
@@ -276,7 +326,11 @@
             case 32:         //Space bar
               if(estado != 2){
                 if(stateMainMenu == 0){
+                  ajustarMapaLevel(level_01);//.mapLevel;
                   player = new Player();
+                  player.sprite.map = mapa;
+                  player.sprite.x = 53;
+                  player.sprite.y = 140;
                   estado = 0;
                 }
                 else{
@@ -307,24 +361,26 @@
     });
 
     addEventListener("keyup", function(e){
-      switch (e.keyCode) {
-        case 37:
-          player.sprite.vx = 0;
-          player.left = false;
-          break;
-        case 39:
-          player.sprite.vx = 0;
-          player.right = false;
-          break;
-        case 38:
-          player.sprite.vy = 0;
-          player.up = false;
-          break;
-        case 40:
-          player.sprite.vy = 0;
-          player.down = false;
-          break;
-        default:
+      if(player!=null){
+        switch (e.keyCode) {
+          case 37:
+            player.sprite.vx = 0;
+            player.left = false;
+            break;
+          case 39:
+            player.sprite.vx = 0;
+            player.right = false;
+            break;
+          case 38:
+            player.sprite.vy = 0;
+            player.up = false;
+            break;
+          case 40:
+            player.sprite.vy = 0;
+            player.down = false;
+            break;
+          default:
+        }
       }
     });
 
